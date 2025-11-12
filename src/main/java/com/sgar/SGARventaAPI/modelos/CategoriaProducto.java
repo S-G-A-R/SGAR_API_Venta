@@ -11,8 +11,12 @@ public class CategoriaProducto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // Usamos Integer ya que el tipo original es INT
+    private Integer id; 
 
     @Column(name = "NombreCat", length = 120, nullable = false)
     private String nombreCat;
+
+    // Relación Uno a Muchos con Producto
+    @OneToMany(mappedBy = "categoriaProducto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.Set<Producto> productos;
 }
