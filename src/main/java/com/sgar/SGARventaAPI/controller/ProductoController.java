@@ -1,0 +1,366 @@
+package com.sgar.SGARventaAPI.controller;
+
+import com.sgar.SGARventaAPI.Servicios.Interfaces.IProductoService;
+import com.sgar.SGARventaAPI.dto.Producto.ProductoRequets;
+import com.sgar.SGARventaAPI.dto.Producto.ProductoResponse;
+import com.sgar.SGARventaAPI.mapper.ProductoMapper;
+import com.sgar.SGARventaAPI.modelos.Producto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/productos")
+@CrossOrigin(origins = "*")
+@Tag(name = "Productos", description = "API para gestión de productos")
+public class ProductoController {
+
+    @Autowired
+    private IProductoService productoService;
+
+    @Autowired
+    private ProductoMapper productoMapper;
+
+    @PostMapping
+    @Operation(summary = "Crear un nuevo producto", description = "Crea un nuevo producto en el sistema")
+    public ResponseEntity<?> crearProducto(@RequestBody ProductoRequets productoDTO) {
+        try {
+            Producto producto = productoMapper.toEntity(productoDTO);
+            Producto nuevoProducto = productoService.crearProducto(producto);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Producto creado exitosamente");
+            response.put("id", nuevoProducto.getId());
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al crear el producto");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping
+    @Operation(summary = "Obtener todos los productos con paginación", 
+               description = "Retorna una lista paginada de todos los productos")
+    public ResponseEntity<?> obtenerTodosProductos(
+            @Parameter(description = "Número de página (inicia en 0)") 
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Tamaño de página") 
+            @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Campo por el cual ordenar") 
+            @RequestParam(defaultValue = "id") String sortBy,
+            @Parameter(description = "Dirección de ordenamiento (asc/desc)") 
+            @RequestParam(defaultValue = "asc") String direction) {
+        
+        try {
+            Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+            Page<Producto> productosPage = productoService.obtenerTodosProductos(pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            response.put("hasNext", productosPage.hasNext());
+            response.put("hasPrevious", productosPage.hasPrevious());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al obtener los productos");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener producto por ID", description = "Retorna un producto específico por su ID")
+    public ResponseEntity<?> obtenerProductoPorId(@PathVariable("id") Integer id) {
+        try {
+            return productoService.obtenerProductoPorId(id)
+                    .map(productoMapper::toDTO)
+                    .map(dto -> new ResponseEntity<>(dto, HttpStatus.OK))
+                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al obtener el producto");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Actualizar producto", description = "Actualiza los datos de un producto existente")
+    public ResponseEntity<?> actualizarProducto(
+            @PathVariable("id") Integer id, 
+            @RequestBody ProductoRequets productoDTO) {
+        try {
+            Producto producto = productoMapper.toEntity(productoDTO);
+            Producto productoActualizado = productoService.actualizarProducto(id, producto);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Producto actualizado exitosamente");
+            response.put("id", productoActualizado.getId());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Producto no encontrado");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al actualizar el producto");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar producto", description = "Elimina un producto del sistema")
+    public ResponseEntity<?> eliminarProducto(@PathVariable("id") Integer id) {
+        try {
+            productoService.eliminarProducto(id);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Producto eliminado exitosamente");
+            response.put("id", id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Producto no encontrado");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al eliminar el producto");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/nombre")
+    @Operation(summary = "Buscar productos por nombre", 
+               description = "Busca productos cuyo nombre contenga el texto especificado")
+    public ResponseEntity<?> buscarPorNombre(
+            @Parameter(description = "Texto a buscar en el nombre") 
+            @RequestParam String nombre,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorNombre(nombre, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por nombre");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/categoria/{categoriaId}")
+    @Operation(summary = "Buscar productos por categoría", 
+               description = "Retorna todos los productos de una categoría específica")
+    public ResponseEntity<?> buscarPorCategoria(
+            @PathVariable Integer categoriaId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorCategoria(categoriaId, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por categoría");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/plan/{planId}")
+    @Operation(summary = "Buscar productos por plan de suscripción", 
+               description = "Retorna todos los productos de un plan de suscripción específico")
+    public ResponseEntity<?> buscarPorPlan(
+            @PathVariable Integer planId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorPlan(planId, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por plan");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/tipo")
+    @Operation(summary = "Buscar productos por tipo", 
+               description = "Busca productos cuyo tipo contenga el texto especificado")
+    public ResponseEntity<?> buscarPorTipo(
+            @Parameter(description = "Texto a buscar en el tipo") 
+            @RequestParam String tipo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorTipo(tipo, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por tipo");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/precio")
+    @Operation(summary = "Buscar productos por rango de precio", 
+               description = "Retorna productos dentro de un rango de precio")
+    public ResponseEntity<?> buscarPorRangoPrecio(
+            @Parameter(description = "Precio mínimo") 
+            @RequestParam BigDecimal minPrecio,
+            @Parameter(description = "Precio máximo") 
+            @RequestParam BigDecimal maxPrecio,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorRangoPrecio(minPrecio, maxPrecio, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por precio");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/categoria-y-plan")
+    @Operation(summary = "Buscar productos por categoría y plan", 
+               description = "Retorna productos filtrados por categoría y plan de suscripción")
+    public ResponseEntity<?> buscarPorCategoriaYPlan(
+            @RequestParam Integer categoriaId,
+            @RequestParam Integer planId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Producto> productosPage = productoService.buscarPorCategoriaYPlan(categoriaId, planId, pageable);
+            
+            List<ProductoResponse> productosDTO = productosPage.getContent().stream()
+                    .map(productoMapper::toDTO)
+                    .collect(Collectors.toList());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("productos", productosDTO);
+            response.put("currentPage", productosPage.getNumber() + 1);
+            response.put("totalItems", productosPage.getTotalElements());
+            response.put("totalPages", productosPage.getTotalPages());
+            response.put("pageSize", productosPage.getSize());
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar productos por categoría y plan");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+}
