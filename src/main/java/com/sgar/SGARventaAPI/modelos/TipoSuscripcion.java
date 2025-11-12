@@ -17,15 +17,15 @@ public class TipoSuscripcion {
     @Column(name = "SuscripcionNombre", length = 120, nullable = false)
     private String suscripcionNombre;
 
-    // Se usa BigDecimal para DECIMAL(8,2)
+    // Precio del tipo de suscripción
     @Column(name = "Precio", precision = 8, scale = 2, nullable = false)
     private BigDecimal precio;
 
+    // EL ATRIBUTO CLAVE: El límite de productos permitido por este tipo de suscripción
     @Column(name = "Limite", nullable = false)
     private Integer limite;
 
-    @Column(name = "ProductoId", nullable = false)
-    private Integer productoId; // NOTA: Esto parece ser un error de diseño en el ER,
-                                // pues un TipoSuscripcion no debería tener un ProductoId NOT NULL.
-                                // Lo mantengo por fidelidad al diagrama.
+    // Relación Uno a Muchos con PlanDeSuscripcion
+    @OneToMany(mappedBy = "tipoSuscripcion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private java.util.Set<PlanDeSuscripcion> planes;
 }
