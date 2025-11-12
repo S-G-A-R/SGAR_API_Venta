@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "ImagenProducto")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,10 +13,10 @@ public class ImagenProductos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // Relación Muchos a Uno con Producto (FK ProductoId)
+    // Relación Muchos a Uno con Producto 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ProductoId", nullable = false)
-    private Productos producto;
+    private Producto producto;
 
     @Lob // Usado para mapear BLOB (Large Object).
     @Column(name = "Imagen")
