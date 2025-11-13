@@ -19,6 +19,34 @@ public class ImagenProductos {
     private Producto producto;
 
     @Lob // Usado para mapear BLOB (Large Object).
-    @Column(name = "Imagen")
-    private byte[] imagen; // Se recomienda usar byte[] para BLOB en JPA
+    @Column(name = "Imagen", columnDefinition = "LONGBLOB")
+    private byte[] imagen; // Se recomienda usar byte[] para LONGBLOB en JPA
+
+
+    @Column(name = "TipoMime", length = 100)
+    private String tipoMime;
+
+    @Column(name = "Tamano")
+    private Long tamano;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
+    public byte[] getImagen() {
+        return imagen;
+    }
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
+    }
 }
