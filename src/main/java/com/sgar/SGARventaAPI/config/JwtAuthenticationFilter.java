@@ -11,11 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-// @Component - Comentado temporalmente para deshabilitar la autenticación JWT
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
@@ -80,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username,
                         null,
-                        role != null ? java.util.List.of(new SimpleGrantedAuthority(role)) : java.util.List.of()
+                        role != null ? java.util.List.of(new SimpleGrantedAuthority("ROLE_" + role)) : java.util.List.of()
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

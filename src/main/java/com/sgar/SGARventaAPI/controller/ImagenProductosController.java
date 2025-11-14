@@ -6,6 +6,7 @@ import com.sgar.SGARventaAPI.dto.imagenproducto.ImagenProductoSalidaDto;
 import com.sgar.SGARventaAPI.Servicios.Interfaces.IImagenProductosService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener metadatos de imagen por ID")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<ImagenProductoSalidaDto> obtenerPorId(@PathVariable Integer id) {
         try {
             ImagenProductoSalidaDto imagen = imagenProductosService.obtenerPorId(id);
@@ -46,6 +48,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener imagen como bytes")
     @GetMapping("/{id}/imagen")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<byte[]> obtenerImagen(@PathVariable Integer id) {
         try {
             byte[] imagen = imagenProductosService.obtenerImagenPorId(id);
@@ -68,6 +71,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Subir nueva imagen")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crear(
             @RequestParam("productoId") Integer productoId,
             @RequestParam("imagen") MultipartFile imagen,
@@ -92,6 +96,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Actualizar imagen existente")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> actualizar(
             @PathVariable Integer id,
             @RequestParam(value = "productoId", required = false) Integer productoId,
@@ -112,6 +117,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Eliminar imagen")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<MessageResponse> eliminar(@PathVariable Integer id) {
         try {
             imagenProductosService.eliminar(id);
@@ -123,6 +129,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener imágenes de un producto")
     @GetMapping("/producto/{productoId}")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<Page<ImagenProductoSalidaDto>> obtenerPorProducto(
             @PathVariable Integer productoId, Pageable pageable) {
         try {
@@ -137,6 +144,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Eliminar todas las imágenes del producto")
     @DeleteMapping("/producto/{productoId}")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<MessageResponse> eliminarTodasDeProducto(@PathVariable Integer productoId) {
         try {
             imagenProductosService.eliminarTodasDeProducto(productoId);
@@ -148,6 +156,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Buscar imágenes con filtros")
     @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<Page<ImagenProductoSalidaDto>> buscarConFiltros(
             @RequestParam(required = false) Integer productoId,
             @RequestParam(required = false) String tipoMime,
