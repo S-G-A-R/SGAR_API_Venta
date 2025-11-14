@@ -7,10 +7,14 @@ import com.sgar.SGARventaAPI.repositorios.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -92,37 +96,49 @@ public class ProductoService implements IProductoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Producto> buscarPorNombre(String nombre, Pageable pageable) {
-        return productoRepository.findByNombreContainingIgnoreCase(nombre, pageable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Producto> buscarPorCategoria(Integer categoriaId, Pageable pageable) {
-        return productoRepository.findByCategoriaProductoId(categoriaId, pageable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Producto> buscarPorPlan(Integer planId, Pageable pageable) {
-        return productoRepository.findByPlanDeSuscripcionId(planId, pageable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Producto> buscarPorTipo(String tipo, Pageable pageable) {
-        return productoRepository.findByTipoContainingIgnoreCase(tipo, pageable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Producto> buscarPorRangoPrecio(BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable) {
-        return productoRepository.findByPrecioBetween(minPrecio, maxPrecio, pageable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<Producto> buscarPorCategoriaYPlan(Integer categoriaId, Integer planId, Pageable pageable) {
-        return productoRepository.findByCategoriaProductoIdAndPlanDeSuscripcionId(categoriaId, planId, pageable);
+    public Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Integer planId,
+                                          BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable) {
+        Specification<Producto> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            // Filtro por nombre
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("nombre")), 
+                    "%" + nombre.toLowerCase() + "%"
+                ));
+            }
+            
+            // Filtro por tipo
+            if (tipo != null && !tipo.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("tipo")), 
+                    "%" + tipo.toLowerCase() + "%"
+                ));
+            }
+            
+            // Filtro por categoría
+            if (categoriaId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("categoriaProducto").get("id"), categoriaId));
+            }
+            
+            // Filtro por plan de suscripción
+            if (planId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("planDeSuscripcion").get("id"), planId));
+            }
+            
+            // Filtro por rango de precio
+            if (minPrecio != null && maxPrecio != null) {
+                predicates.add(criteriaBuilder.between(root.get("precio"), minPrecio, maxPrecio));
+            } else if (minPrecio != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("precio"), minPrecio));
+            } else if (maxPrecio != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("precio"), maxPrecio));
+            }
+            
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        
+        return productoRepository.findAll(spec, pageable);
     }
 }

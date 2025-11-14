@@ -19,15 +19,6 @@ public interface IProductoService {
     
     void eliminarProducto(Integer id);
     
-    Page<Producto> buscarPorNombre(String nombre, Pageable pageable);
-    
-    Page<Producto> buscarPorCategoria(Integer categoriaId, Pageable pageable);
-    
-    Page<Producto> buscarPorPlan(Integer planId, Pageable pageable);
-    
-    Page<Producto> buscarPorTipo(String tipo, Pageable pageable);
-    
-    Page<Producto> buscarPorRangoPrecio(BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable);
-    
-    Page<Producto> buscarPorCategoriaYPlan(Integer categoriaId, Integer planId, Pageable pageable);
+    Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Integer planId, 
+                                   BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable);
 }
