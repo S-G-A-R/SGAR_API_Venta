@@ -8,6 +8,7 @@ import com.sgar.SGARventaAPI.modelos.CategoriaProducto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,7 @@ public class CategoriaProductoController {
 
     @PostMapping
     @Operation(summary = "Crear una nueva categoría de producto", description = "Crea una nueva categoría de producto en el sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearCategoriaProducto(@RequestBody CategoriaProductoRequets categoriaDTO) {
         try {
             CategoriaProducto categoria = categoriaProductoMapper.toEntity(categoriaDTO);
@@ -57,6 +59,7 @@ public class CategoriaProductoController {
     @GetMapping
     @Operation(summary = "Obtener todas las categorías con paginación", 
                description = "Retorna una lista paginada de todas las categorías de productos")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> obtenerTodasCategorias(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -97,6 +100,7 @@ public class CategoriaProductoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener categoría por ID", description = "Retorna una categoría de producto específica por su ID")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> obtenerCategoriaPorId(@PathVariable("id") Integer id) {
         try {
             return categoriaProductoService.obtenerCategoriaPorId(id)
@@ -113,6 +117,7 @@ public class CategoriaProductoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar categoría", description = "Actualiza los datos de una categoría de producto existente")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> actualizarCategoriaProducto(
             @PathVariable("id") Integer id, 
             @RequestBody CategoriaProductoRequets categoriaDTO) {
@@ -139,6 +144,7 @@ public class CategoriaProductoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar categoría", description = "Elimina una categoría de producto del sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> eliminarCategoriaProducto(@PathVariable("id") Integer id) {
         try {
             categoriaProductoService.eliminarCategoriaProducto(id);
@@ -162,6 +168,7 @@ public class CategoriaProductoController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar categorías por nombre", 
                description = "Busca categorías cuyo nombre contenga el texto especificado")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre") 
             @RequestParam String nombre,

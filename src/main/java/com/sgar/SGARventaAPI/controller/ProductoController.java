@@ -8,6 +8,7 @@ import com.sgar.SGARventaAPI.modelos.Producto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,7 @@ public class ProductoController {
 
     @PostMapping
     @Operation(summary = "Crear un nuevo producto", description = "Crea un nuevo producto en el sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearProducto(@RequestBody ProductoRequets productoDTO) {
         try {
             Producto producto = productoMapper.toEntity(productoDTO);
@@ -58,6 +60,7 @@ public class ProductoController {
     @GetMapping
     @Operation(summary = "Obtener todos los productos con paginación", 
                description = "Retorna una lista paginada de todos los productos")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> obtenerTodosProductos(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -98,6 +101,7 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener producto por ID", description = "Retorna un producto específico por su ID")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> obtenerProductoPorId(@PathVariable("id") Integer id) {
         try {
             return productoService.obtenerProductoPorId(id)
@@ -114,6 +118,7 @@ public class ProductoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar producto", description = "Actualiza los datos de un producto existente")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> actualizarProducto(
             @PathVariable("id") Integer id, 
             @RequestBody ProductoRequets productoDTO) {
@@ -140,6 +145,7 @@ public class ProductoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar producto", description = "Elimina un producto del sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> eliminarProducto(@PathVariable("id") Integer id) {
         try {
             productoService.eliminarProducto(id);

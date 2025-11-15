@@ -9,6 +9,7 @@ import com.sgar.SGARventaAPI.modelos.Empresa;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +38,7 @@ public class EmpresaController {
 
     @PostMapping
     @Operation(summary = "Crear una nueva empresa", description = "Crea una nueva empresa en el sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearEmpresa(@RequestBody EmpresaRequets empresaDTO) {
         try {
             Empresa empresa = empresaMapper.toEntity(empresaDTO);
@@ -58,6 +60,7 @@ public class EmpresaController {
     @GetMapping
     @Operation(summary = "Obtener todas las empresas con paginación", 
                description = "Retorna una lista paginada de todas las empresas")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> obtenerTodasLasEmpresas(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -99,6 +102,7 @@ public class EmpresaController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener empresa por ID", description = "Retorna una empresa específica por su ID")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<EmpresaResponse> obtenerEmpresaPorId(@PathVariable("id") Long id) {
         return empresaService.obtenerEmpresaPorId(id)
                 .map(empresaMapper::toDTO)
@@ -108,6 +112,7 @@ public class EmpresaController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar empresa", description = "Actualiza los datos de una empresa existente")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> actualizarEmpresa(
             @PathVariable("id") Long id, 
             @RequestBody EmpresaRequets empresaDTO) {
@@ -133,6 +138,7 @@ public class EmpresaController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar empresa", description = "Elimina una empresa del sistema")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> eliminarEmpresa(@PathVariable("id") Long id) {
         try {
             empresaService.eliminarEmpresa(id);
@@ -156,6 +162,7 @@ public class EmpresaController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar empresas por nombre", 
                description = "Busca empresas cuyo nombre contenga el texto especificado")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre de la empresa") 
             @RequestParam String nombre,
@@ -190,6 +197,7 @@ public class EmpresaController {
     @GetMapping("/buscar/asociado/{asociadoId}")
     @Operation(summary = "Buscar empresas por ID de asociado", 
                description = "Retorna todas las empresas asociadas a un ID específico")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> buscarPorAsociadoId(
             @PathVariable Long asociadoId,
             @RequestParam(defaultValue = "0") int page,
