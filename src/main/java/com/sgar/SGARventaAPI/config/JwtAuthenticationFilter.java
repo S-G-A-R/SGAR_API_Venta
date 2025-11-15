@@ -75,19 +75,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .getBody();
 
             String username = claims.getSubject();
+            if (username == null || username.isEmpty()) {
+                username = claims.get("nameid", String.class);
+            }
             String role = claims.get("role", String.class);
 
             if (username != null) {
+                System.out.println("JWT Success - Username: " + username + ", Role: " + role);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username,
                         null,
                         role != null ? java.util.List.of(new SimpleGrantedAuthority("ROLE_" + role)) : java.util.List.of()
                 );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("Authentication set with authorities: " + authentication.getAuthorities());
             }
         } catch (Exception e) {
+            System.out.println("JWT Error: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token inválido o expirado");
+            response.getWriter().write("Token inválido o expirado: " + e.getMessage());
             return;
         }
 
