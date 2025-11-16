@@ -60,7 +60,7 @@ public class ProductoController {
     @GetMapping
     @Operation(summary = "Obtener todos los productos con paginación", 
                description = "Retorna una lista paginada de todos los productos")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> obtenerTodosProductos(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -101,7 +101,7 @@ public class ProductoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener producto por ID", description = "Retorna un producto específico por su ID")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> obtenerProductoPorId(@PathVariable("id") Integer id) {
         try {
             return productoService.obtenerProductoPorId(id)

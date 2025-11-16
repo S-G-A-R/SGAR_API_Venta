@@ -59,7 +59,7 @@ public class CategoriaProductoController {
     @GetMapping
     @Operation(summary = "Obtener todas las categorías con paginación", 
                description = "Retorna una lista paginada de todas las categorías de productos")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> obtenerTodasCategorias(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -100,7 +100,7 @@ public class CategoriaProductoController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener categoría por ID", description = "Retorna una categoría de producto específica por su ID")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> obtenerCategoriaPorId(@PathVariable("id") Integer id) {
         try {
             return categoriaProductoService.obtenerCategoriaPorId(id)
@@ -168,7 +168,7 @@ public class CategoriaProductoController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar categorías por nombre", 
                description = "Busca categorías cuyo nombre contenga el texto especificado")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre") 
             @RequestParam String nombre,
