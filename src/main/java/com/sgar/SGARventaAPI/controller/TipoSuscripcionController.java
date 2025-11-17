@@ -38,7 +38,7 @@ public class TipoSuscripcionController {
 
     @PostMapping
     @Operation(summary = "Crear un nuevo tipo de suscripción", description = "Crea un nuevo tipo de suscripción en el sistema")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador')")
     public ResponseEntity<?> crearTipoSuscripcion(@RequestBody TipoSuscripcionRequets tipoDTO) {
         try {
             TipoSuscripcion tipo = tipoSuscripcionMapper.toEntity(tipoDTO);
@@ -60,7 +60,7 @@ public class TipoSuscripcionController {
     @GetMapping
     @Operation(summary = "Obtener todos los tipos de suscripción con paginación", 
                description = "Retorna una lista paginada de todos los tipos de suscripción")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador','ROLE_Asociado')")
     public ResponseEntity<?> obtenerTodosTiposSuscripcion(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -101,7 +101,7 @@ public class TipoSuscripcionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener tipo de suscripción por ID", description = "Retorna un tipo de suscripción específico por su ID")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador','ROLE_Asociado')")
     public ResponseEntity<?> obtenerTipoSuscripcionPorId(@PathVariable("id") Integer id) {
         try {
             return tipoSuscripcionService.obtenerTipoSuscripcionPorId(id)
@@ -169,7 +169,7 @@ public class TipoSuscripcionController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar tipos de suscripción por nombre", 
                description = "Busca tipos de suscripción cuyo nombre contenga el texto especificado")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador','ROLE_Asociado')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre") 
             @RequestParam String nombre,
@@ -204,7 +204,7 @@ public class TipoSuscripcionController {
     @GetMapping("/buscar/precio")
     @Operation(summary = "Buscar tipos de suscripción por rango de precio", 
                description = "Retorna tipos de suscripción dentro de un rango de precio")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador','ROLE_Asociado')")
     public ResponseEntity<?> buscarPorRangoPrecio(
             @Parameter(description = "Precio mínimo") 
             @RequestParam BigDecimal minPrecio,
@@ -241,7 +241,7 @@ public class TipoSuscripcionController {
     @GetMapping("/buscar/limite/{limite}")
     @Operation(summary = "Buscar tipos de suscripción por límite mínimo", 
                description = "Retorna tipos de suscripción con límite mayor o igual al especificado")
-    @PreAuthorize("hasAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Administrador','ROLE_Asociado','ROLE_Ciudadano')")
     public ResponseEntity<?> buscarPorLimite(
             @PathVariable Integer limite,
             @RequestParam(defaultValue = "0") int page,

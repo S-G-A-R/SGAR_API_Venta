@@ -36,7 +36,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener metadatos de imagen por ID")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<ImagenProductoSalidaDto> obtenerPorId(@PathVariable Integer id) {
         try {
             ImagenProductoSalidaDto imagen = imagenProductosService.obtenerPorId(id);
@@ -48,7 +48,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener imagen como bytes")
     @GetMapping("/{id}/imagen")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<byte[]> obtenerImagen(@PathVariable Integer id) {
         try {
             byte[] imagen = imagenProductosService.obtenerImagenPorId(id);
@@ -129,7 +129,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Obtener imágenes de un producto")
     @GetMapping("/producto/{productoId}")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<Page<ImagenProductoSalidaDto>> obtenerPorProducto(
             @PathVariable Integer productoId, Pageable pageable) {
         try {
@@ -156,7 +156,7 @@ public class ImagenProductosController {
 
     @Operation(summary = "Buscar imágenes con filtros")
     @GetMapping("/buscar")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<Page<ImagenProductoSalidaDto>> buscarConFiltros(
             @RequestParam(required = false) Integer productoId,
             @RequestParam(required = false) String tipoMime,

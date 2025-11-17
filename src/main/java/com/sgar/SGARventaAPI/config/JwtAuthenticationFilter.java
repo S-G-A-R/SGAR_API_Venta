@@ -70,6 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
                     .requireIssuer(issuer)
                     .requireAudience(audience)
+                    .setAllowedClockSkewSeconds(86400) 
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

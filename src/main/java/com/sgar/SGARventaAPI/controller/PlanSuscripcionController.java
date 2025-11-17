@@ -37,7 +37,7 @@ public class PlanSuscripcionController {
 
     @PostMapping
     @Operation(summary = "Crear un nuevo plan de suscripción", description = "Crea un nuevo plan de suscripción en el sistema")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearPlan(@RequestBody PlanDeSuscripcionRequets planDTO) {
         try {
             PlanDeSuscripcion plan = planMapper.toEntity(planDTO);
@@ -59,7 +59,7 @@ public class PlanSuscripcionController {
     @GetMapping
     @Operation(summary = "Obtener todos los planes con paginación", 
                description = "Retorna una lista paginada de todos los planes de suscripción")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> obtenerTodosLosPlanes(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -100,7 +100,7 @@ public class PlanSuscripcionController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Obtener plan por ID", description = "Retorna un plan de suscripción específico por su ID")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> obtenerPlanPorId(@PathVariable("id") Integer id) {
         try {
             return planService.obtenerPlanPorId(id)
@@ -168,7 +168,7 @@ public class PlanSuscripcionController {
     @GetMapping("/buscar/empresa/{empresaId}")
     @Operation(summary = "Buscar planes por empresa", 
                description = "Retorna todos los planes de suscripción de una empresa específica")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> buscarPorEmpresa(
             @PathVariable Long empresaId,
             @RequestParam(defaultValue = "0") int page,
@@ -238,7 +238,7 @@ public class PlanSuscripcionController {
     @GetMapping("/buscar/tipo-suscripcion/{tipoSuscripcionId}")
     @Operation(summary = "Buscar planes por tipo de suscripción", 
                description = "Retorna todos los planes de un tipo de suscripción específico")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> buscarPorTipoSuscripcion(
             @PathVariable Integer tipoSuscripcionId,
             @RequestParam(defaultValue = "0") int page,
@@ -272,7 +272,7 @@ public class PlanSuscripcionController {
     @GetMapping("/buscar/empresa-y-tipo")
     @Operation(summary = "Buscar planes por empresa y tipo de suscripción", 
                description = "Retorna todos los planes filtrados por empresa y tipo de suscripción")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> buscarPorEmpresaYTipo(
             @RequestParam Long empresaId,
             @RequestParam Integer tipoSuscripcionId,
