@@ -1,7 +1,7 @@
 package com.sgar.SGARventaAPI.mapper;
 
-import com.sgar.SGARventaAPI.dto.CatefgoriaProducto.CategoriaProductoRequets;
-import com.sgar.SGARventaAPI.dto.CatefgoriaProducto.CategoriaProductoResponse;
+import com.sgar.SGARventaAPI.dto.CategoriaProducto.CategoriaProductoRequets;
+import com.sgar.SGARventaAPI.dto.CategoriaProducto.CategoriaProductoResponse;
 import com.sgar.SGARventaAPI.modelos.CategoriaProducto;
 import org.springframework.stereotype.Component;
 

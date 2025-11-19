@@ -19,10 +19,10 @@ public class Producto {
     @JoinColumn(name = "CategoriaProductoId", nullable = false)
     private CategoriaProducto categoriaProducto;
 
-    // NUEVA FK PlanDeSuscripcionId: El producto pertenece a un plan
+    // FK EmpresaId: El producto pertenece a una empresa
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PlanDeSuscripcionId", nullable = false)
-    private PlanDeSuscripcion planDeSuscripcion;
+    @JoinColumn(name = "EmpresaId", nullable = false)
+    private Empresa empresa;
 
     @Column(name = "Nombre", length = 150, nullable = false)
     private String nombre;

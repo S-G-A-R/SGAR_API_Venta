@@ -1,4 +1,4 @@
-package com.sgar.SGARventaAPI.dto.CatefgoriaProducto;
+package com.sgar.SGARventaAPI.dto.CategoriaProducto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

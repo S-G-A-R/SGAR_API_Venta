@@ -168,7 +168,7 @@ public class ProductoController {
 
     @GetMapping("/buscar")
     @Operation(summary = "Buscar productos con filtros múltiples", 
-               description = "Busca productos aplicando filtros opcionales: nombre, tipo, categoría, plan y rango de precio")
+               description = "Busca productos aplicando filtros opcionales: nombre, tipo, categoría, empresa y rango de precio")
              @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<?> buscarProductos(
             @Parameter(description = "Texto a buscar en el nombre del producto") 
@@ -177,8 +177,8 @@ public class ProductoController {
             @RequestParam(required = false) String tipo,
             @Parameter(description = "ID de la categoría") 
             @RequestParam(required = false) Integer categoriaId,
-            @Parameter(description = "ID del plan de suscripción") 
-            @RequestParam(required = false) Integer planId,
+            @Parameter(description = "ID de la empresa") 
+            @RequestParam(required = false) Long empresaId,
             @Parameter(description = "Precio mínimo") 
             @RequestParam(required = false) BigDecimal minPrecio,
             @Parameter(description = "Precio máximo") 
@@ -197,7 +197,7 @@ public class ProductoController {
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
             
             Page<Producto> productosPage = productoService.buscarProductos(
-                nombre, tipo, categoriaId, planId, minPrecio, maxPrecio, pageable
+                nombre, tipo, categoriaId, empresaId, minPrecio, maxPrecio, pageable
             );
             
             List<ProductoResponse> productosDTO = productosPage.getContent().stream()

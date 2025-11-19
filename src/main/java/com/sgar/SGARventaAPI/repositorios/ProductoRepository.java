@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Integer>, JpaSpecificationExecutor<Producto> {
     
-    // Contar productos por plan de suscripción
-    long countByPlanDeSuscripcionId(Integer planId);
+    // Contar productos por empresa
+    long countByEmpresaId(Long empresaId);
 }

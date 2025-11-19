@@ -1,8 +1,8 @@
 package com.sgar.SGARventaAPI.controller;
 
 import com.sgar.SGARventaAPI.Servicios.Interfaces.ICategoriaProductoService;
-import com.sgar.SGARventaAPI.dto.CatefgoriaProducto.CategoriaProductoRequets;
-import com.sgar.SGARventaAPI.dto.CatefgoriaProducto.CategoriaProductoResponse;
+import com.sgar.SGARventaAPI.dto.CategoriaProducto.CategoriaProductoRequets;
+import com.sgar.SGARventaAPI.dto.CategoriaProducto.CategoriaProductoResponse;
 import com.sgar.SGARventaAPI.mapper.CategoriaProductoMapper;
 import com.sgar.SGARventaAPI.modelos.CategoriaProducto;
 import io.swagger.v3.oas.annotations.Operation;

@@ -2,6 +2,7 @@ package com.sgar.SGARventaAPI.Servicios.Implementaciones;
 
 import com.sgar.SGARventaAPI.Servicios.Interfaces.IProductoService;
 import com.sgar.SGARventaAPI.modelos.Producto;
+import com.sgar.SGARventaAPI.repositorios.EmpresaRepository;
 import com.sgar.SGARventaAPI.repositorios.ProductoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +23,35 @@ public class ProductoService implements IProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
+    
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
     @Override
     @Transactional
     public Producto crearProducto(Producto producto) {
-        // Validar que el plan de suscripción no haya alcanzado su límite de productos
-        if (producto.getPlanDeSuscripcion() != null) {
-            Integer planId = producto.getPlanDeSuscripcion().getId();
-            Integer limite = producto.getPlanDeSuscripcion().getTipoSuscripcion().getLimite();
-            
-            // Contar productos actuales en el plan
-            long productosActuales = productoRepository.countByPlanDeSuscripcionId(planId);
-            
-            if (productosActuales >= limite) {
-                throw new RuntimeException("El plan de suscripción ha alcanzado su límite de " + limite + " productos. No se pueden agregar más productos.");
-            }
+        // Validar que la empresa no haya alcanzado su límite de productos según su plan de suscripción
+        if (producto.getEmpresa() == null || producto.getEmpresa().getId() == null) {
+            throw new RuntimeException("Debe especificar una empresa para el producto.");
+        }
+        
+        Long empresaId = producto.getEmpresa().getId();
+        
+        // Verificar que la empresa existe
+        if (!empresaRepository.existsById(empresaId)) {
+            throw new RuntimeException("Empresa no encontrada con id: " + empresaId);
+        }
+        
+        // Obtener el límite de productos directamente sin cargar colecciones
+        Integer limite = empresaRepository.findLimiteProductosByEmpresaId(empresaId)
+            .orElseThrow(() -> new RuntimeException("La empresa no tiene un plan de suscripción asignado. No se puede crear el producto."));
+        
+        // Contar productos actuales de la empresa
+        long productosActuales = productoRepository.countByEmpresaId(empresaId);
+        
+        if (productosActuales >= limite) {
+            throw new RuntimeException("La empresa ha alcanzado su límite de " + limite + 
+                " productos según su plan de suscripción. No se pueden agregar más productos.");
         }
         
         return productoRepository.save(producto);
@@ -59,18 +74,27 @@ public class ProductoService implements IProductoService {
     public Producto actualizarProducto(Integer id, Producto producto) {
         return productoRepository.findById(id)
                 .map(productoExistente -> {
-                    // Si se está cambiando de plan, validar el límite del nuevo plan
-                    if (producto.getPlanDeSuscripcion() != null && 
-                        !producto.getPlanDeSuscripcion().getId().equals(productoExistente.getPlanDeSuscripcion().getId())) {
+                    // Si se está cambiando de empresa, validar el límite de la nueva empresa
+                    if (producto.getEmpresa() != null && 
+                        !producto.getEmpresa().getId().equals(productoExistente.getEmpresa().getId())) {
                         
-                        Integer nuevoPlanId = producto.getPlanDeSuscripcion().getId();
-                        Integer limite = producto.getPlanDeSuscripcion().getTipoSuscripcion().getLimite();
+                        Long nuevaEmpresaId = producto.getEmpresa().getId();
                         
-                        // Contar productos actuales en el nuevo plan
-                        long productosActuales = productoRepository.countByPlanDeSuscripcionId(nuevoPlanId);
+                        // Verificar que la nueva empresa existe
+                        if (!empresaRepository.existsById(nuevaEmpresaId)) {
+                            throw new RuntimeException("Empresa no encontrada con id: " + nuevaEmpresaId);
+                        }
+                        
+                        // Obtener el límite de productos directamente
+                        Integer limite = empresaRepository.findLimiteProductosByEmpresaId(nuevaEmpresaId)
+                            .orElseThrow(() -> new RuntimeException("La empresa no tiene un plan de suscripción asignado."));
+                        
+                        // Contar productos actuales de la nueva empresa
+                        long productosActuales = productoRepository.countByEmpresaId(nuevaEmpresaId);
                         
                         if (productosActuales >= limite) {
-                            throw new RuntimeException("El plan de suscripción ha alcanzado su límite de " + limite + " productos. No se puede mover el producto a este plan.");
+                            throw new RuntimeException("La empresa ha alcanzado su límite de " + limite + 
+                                " productos según su plan de suscripción. No se puede mover el producto a esta empresa.");
                         }
                     }
                     
@@ -79,7 +103,8 @@ public class ProductoService implements IProductoService {
                     productoExistente.setTipo(producto.getTipo());
                     productoExistente.setDescripcion(producto.getDescripcion());
                     productoExistente.setCategoriaProducto(producto.getCategoriaProducto());
-                    productoExistente.setPlanDeSuscripcion(producto.getPlanDeSuscripcion());
+                    productoExistente.setEmpresa(producto.getEmpresa());
+                    
                     return productoRepository.save(productoExistente);
                 })
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con id: " + id));
@@ -96,7 +121,7 @@ public class ProductoService implements IProductoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Integer planId,
+    public Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Long empresaId,
                                           BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable) {
         Specification<Producto> spec = (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -122,9 +147,9 @@ public class ProductoService implements IProductoService {
                 predicates.add(criteriaBuilder.equal(root.get("categoriaProducto").get("id"), categoriaId));
             }
             
-            // Filtro por plan de suscripción
-            if (planId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("planDeSuscripcion").get("id"), planId));
+            // Filtro por empresa
+            if (empresaId != null) {
+                predicates.add(criteriaBuilder.equal(root.get("empresa").get("id"), empresaId));
             }
             
             // Filtro por rango de precio

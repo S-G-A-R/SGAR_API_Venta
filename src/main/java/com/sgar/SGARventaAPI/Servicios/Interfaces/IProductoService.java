@@ -19,6 +19,6 @@ public interface IProductoService {
     
     void eliminarProducto(Integer id);
     
-    Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Integer planId, 
+    Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Long empresaId, 
                                    BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable);
 }

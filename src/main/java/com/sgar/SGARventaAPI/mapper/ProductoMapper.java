@@ -3,10 +3,10 @@ package com.sgar.SGARventaAPI.mapper;
 import com.sgar.SGARventaAPI.dto.Producto.ProductoRequets;
 import com.sgar.SGARventaAPI.dto.Producto.ProductoResponse;
 import com.sgar.SGARventaAPI.modelos.CategoriaProducto;
-import com.sgar.SGARventaAPI.modelos.PlanDeSuscripcion;
+import com.sgar.SGARventaAPI.modelos.Empresa;
 import com.sgar.SGARventaAPI.modelos.Producto;
 import com.sgar.SGARventaAPI.repositorios.CategoriaProductoRepository;
-import com.sgar.SGARventaAPI.repositorios.PlanSuscripcionRepository;
+import com.sgar.SGARventaAPI.repositorios.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +17,13 @@ public class ProductoMapper {
     private CategoriaProductoMapper categoriaProductoMapper;
 
     @Autowired
-    private PlanDeSuscripcionMapper planDeSuscripcionMapper;
+    private EmpresaMapper empresaMapper;
 
     @Autowired
     private CategoriaProductoRepository categoriaProductoRepository;
 
     @Autowired
-    private PlanSuscripcionRepository planSuscripcionRepository;
+    private EmpresaRepository empresaRepository;
 
     public ProductoResponse toDTO(Producto producto) {
         if (producto == null) {
@@ -37,7 +37,7 @@ public class ProductoMapper {
         dto.setTipo(producto.getTipo());
         dto.setDescripcion(producto.getDescripcion());
         dto.setCategoriaProducto(categoriaProductoMapper.toDTO(producto.getCategoriaProducto()));
-        dto.setPlanDeSuscripcion(planDeSuscripcionMapper.toDTO(producto.getPlanDeSuscripcion()));
+        dto.setEmpresa(empresaMapper.toDTO(producto.getEmpresa()));
         
         return dto;
     }
@@ -60,11 +60,11 @@ public class ProductoMapper {
             producto.setCategoriaProducto(categoria);
         }
         
-        // Buscar y asignar plan
-        if (dto.getPlanDeSuscripcionId() != null) {
-            PlanDeSuscripcion plan = planSuscripcionRepository.findById(dto.getPlanDeSuscripcionId())
-                    .orElseThrow(() -> new RuntimeException("Plan de suscripción no encontrado con id: " + dto.getPlanDeSuscripcionId()));
-            producto.setPlanDeSuscripcion(plan);
+        // Buscar y asignar empresa
+        if (dto.getEmpresaId() != null) {
+            Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
+                    .orElseThrow(() -> new RuntimeException("Empresa no encontrada con id: " + dto.getEmpresaId()));
+            producto.setEmpresa(empresa);
         }
         
         return producto;
@@ -87,11 +87,11 @@ public class ProductoMapper {
             producto.setCategoriaProducto(categoria);
         }
         
-        // Actualizar plan
-        if (dto.getPlanDeSuscripcionId() != null) {
-            PlanDeSuscripcion plan = planSuscripcionRepository.findById(dto.getPlanDeSuscripcionId())
-                    .orElseThrow(() -> new RuntimeException("Plan de suscripción no encontrado con id: " + dto.getPlanDeSuscripcionId()));
-            producto.setPlanDeSuscripcion(plan);
+        // Actualizar empresa
+        if (dto.getEmpresaId() != null) {
+            Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
+                    .orElseThrow(() -> new RuntimeException("Empresa no encontrada con id: " + dto.getEmpresaId()));
+            producto.setEmpresa(empresa);
         }
     }
 }

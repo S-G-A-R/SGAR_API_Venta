@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
-import com.sgar.SGARventaAPI.dto.CatefgoriaProducto.CategoriaProductoResponse;
-import com.sgar.SGARventaAPI.dto.PlanSuscripcion.PlanDeSuscripcionResponse;
+import com.sgar.SGARventaAPI.dto.CategoriaProducto.CategoriaProductoResponse;
+import com.sgar.SGARventaAPI.dto.Empresa.EmpresaResponse;
 
 @Data
 @NoArgsConstructor
@@ -19,5 +19,5 @@ public class ProductoResponse {
     private String tipo;
     private String descripcion;
     private CategoriaProductoResponse categoriaProducto;
-    private PlanDeSuscripcionResponse planDeSuscripcion;
+    private EmpresaResponse empresa;
 }

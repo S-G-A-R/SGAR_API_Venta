@@ -23,8 +23,4 @@ public class PlanDeSuscripcion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TipoSuscripcionId", nullable = false)
     private TipoSuscripcion tipoSuscripcion;
-    
-    // Relación Uno a Muchos con Producto
-    @OneToMany(mappedBy = "planDeSuscripcion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private java.util.Set<Producto> productos;
 }

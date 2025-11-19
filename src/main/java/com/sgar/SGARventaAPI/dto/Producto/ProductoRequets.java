@@ -15,5 +15,5 @@ public class ProductoRequets {
     private String tipo;
     private String descripcion;
     private Integer categoriaProductoId;
-    private Integer planDeSuscripcionId;
+    private Long empresaId;
 }
