@@ -162,7 +162,7 @@ public class EmpresaController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar empresas por nombre", 
                description = "Busca empresas cuyo nombre contenga el texto especificado")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado, , ROLE_Administrador')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre de la empresa") 
             @RequestParam String nombre,
