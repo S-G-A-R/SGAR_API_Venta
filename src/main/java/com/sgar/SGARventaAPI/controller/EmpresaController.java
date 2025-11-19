@@ -60,7 +60,7 @@ public class EmpresaController {
     @GetMapping
     @Operation(summary = "Obtener todas las empresas con paginación", 
                description = "Retorna una lista paginada de todas las empresas")
-    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    @PreAuthorize("hasAuthority('ROLE_Asociado, ROLE_Administrador')")
     public ResponseEntity<?> obtenerTodasLasEmpresas(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
