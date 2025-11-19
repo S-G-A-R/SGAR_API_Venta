@@ -60,7 +60,7 @@ public class EmpresaController {
     @GetMapping
     @Operation(summary = "Obtener todas las empresas con paginación", 
                description = "Retorna una lista paginada de todas las empresas")
-    @PreAuthorize("hasAuthority('ROLE_Asociado, ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> obtenerTodasLasEmpresas(
             @Parameter(description = "Número de página (inicia en 0)") 
             @RequestParam(defaultValue = "0") int page,
@@ -162,7 +162,7 @@ public class EmpresaController {
     @GetMapping("/buscar/nombre")
     @Operation(summary = "Buscar empresas por nombre", 
                description = "Busca empresas cuyo nombre contenga el texto especificado")
-    @PreAuthorize("hasAuthority('ROLE_Asociado, , ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> buscarPorNombre(
             @Parameter(description = "Texto a buscar en el nombre de la empresa") 
             @RequestParam String nombre,
