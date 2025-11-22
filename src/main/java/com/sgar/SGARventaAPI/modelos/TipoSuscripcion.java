@@ -3,6 +3,7 @@ package com.sgar.SGARventaAPI.modelos;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -24,6 +25,12 @@ public class TipoSuscripcion {
     // EL ATRIBUTO CLAVE: El límite de productos permitido por este tipo de suscripción
     @Column(name = "Limite", nullable = false)
     private Integer limite;
+
+    @Column(name = "FechaInicio", nullable = true)
+    private LocalDateTime fechaInicio;
+
+    @Column(name = "FechaFin", nullable = true)
+    private LocalDateTime fechaFin;
 
     // Relación Uno a Muchos con PlanDeSuscripcion
     @OneToMany(mappedBy = "tipoSuscripcion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
