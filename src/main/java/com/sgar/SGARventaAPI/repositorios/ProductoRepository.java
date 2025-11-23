@@ -11,4 +11,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer>, Jp
     
     // Contar productos por empresa
     long countByEmpresaId(Long empresaId);
+
+    // Contar productos por asociado (a través de empresa.asociadoId)
+    long countByEmpresaAsociadoId(Long asociadoId);
 }

@@ -19,6 +19,9 @@ public interface IProductoService {
     
     void eliminarProducto(Integer id);
     
-    Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Long empresaId, 
+    Page<Producto> buscarProductos(String nombre, String tipo, Integer categoriaId, Long empresaId, Long asociadoId,
                                    BigDecimal minPrecio, BigDecimal maxPrecio, Pageable pageable);
+
+    /** Verifica si la empresa (por id) puede agregar más productos según el plan del asociado. */
+    boolean puedeAgregarProducto(Long empresaId);
 }

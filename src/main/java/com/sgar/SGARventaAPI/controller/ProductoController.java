@@ -57,6 +57,25 @@ public class ProductoController {
         }
     }
 
+    @GetMapping("/verificar-limite/{empresaId}")
+    @Operation(summary = "Verificar límite de productos por empresa", description = "Verifica si la empresa puede agregar más productos según el plan del asociado")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    public ResponseEntity<?> verificarLimite(@PathVariable("empresaId") Long empresaId) {
+        try {
+            boolean puede = productoService.puedeAgregarProducto(empresaId);
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("empresaId", empresaId);
+            resp.put("puedeAgregar", puede);
+            resp.put("message", puede ? "Puede agregar más productos" : "Ha alcanzado el límite de productos");
+            return new ResponseEntity<>(resp, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al verificar límite de productos");
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping
     @Operation(summary = "Obtener todos los productos con paginación", 
                description = "Retorna una lista paginada de todos los productos")
@@ -179,6 +198,8 @@ public class ProductoController {
             @RequestParam(required = false) Integer categoriaId,
             @Parameter(description = "ID de la empresa") 
             @RequestParam(required = false) Long empresaId,
+            @Parameter(description = "ID del asociado")
+            @RequestParam(required = false) Long asociadoId,
             @Parameter(description = "Precio mínimo") 
             @RequestParam(required = false) BigDecimal minPrecio,
             @Parameter(description = "Precio máximo") 
@@ -197,7 +218,7 @@ public class ProductoController {
             Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
             
             Page<Producto> productosPage = productoService.buscarProductos(
-                nombre, tipo, categoriaId, empresaId, minPrecio, maxPrecio, pageable
+                nombre, tipo, categoriaId, empresaId, asociadoId, minPrecio, maxPrecio, pageable
             );
             
             List<ProductoResponse> productosDTO = productosPage.getContent().stream()

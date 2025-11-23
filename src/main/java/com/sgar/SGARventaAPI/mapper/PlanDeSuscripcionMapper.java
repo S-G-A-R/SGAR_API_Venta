@@ -2,7 +2,6 @@ package com.sgar.SGARventaAPI.mapper;
 
 import com.sgar.SGARventaAPI.dto.PlanSuscripcion.PlanDeSuscripcionRequets;
 import com.sgar.SGARventaAPI.dto.PlanSuscripcion.PlanDeSuscripcionResponse;
-import com.sgar.SGARventaAPI.modelos.Empresa;
 import com.sgar.SGARventaAPI.modelos.PlanDeSuscripcion;
 import com.sgar.SGARventaAPI.modelos.TipoSuscripcion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PlanDeSuscripcionMapper {
-
-    @Autowired
-    private EmpresaMapper empresaMapper;
 
     @Autowired
     private TipoSuscripcionMapper tipoSuscripcionMapper;
@@ -23,7 +19,10 @@ public class PlanDeSuscripcionMapper {
         }
         PlanDeSuscripcionResponse dto = new PlanDeSuscripcionResponse();
         dto.setId(plan.getId());
-        dto.setEmpresa(empresaMapper.toDTO(plan.getEmpresa()));
+        dto.setAsociadoId(plan.getAsociadoId());
+        dto.setFechaInicio(plan.getFechaInicio());
+        dto.setFechaFin(plan.getFechaFin());
+        dto.setActivo(plan.getActivo());
         dto.setTipoSuscripcion(tipoSuscripcionMapper.toDTO(plan.getTipoSuscripcion()));
         return dto;
     }
@@ -33,14 +32,10 @@ public class PlanDeSuscripcionMapper {
             return null;
         }
         PlanDeSuscripcion plan = new PlanDeSuscripcion();
-        
-        // Configurar empresa
-        if (dto.getEmpresaId() != null) {
-            Empresa empresa = new Empresa();
-            empresa.setId(dto.getEmpresaId());
-            plan.setEmpresa(empresa);
+        // Configurar asociado
+        if (dto.getAsociadoId() != null) {
+            plan.setAsociadoId(dto.getAsociadoId());
         }
-        
         // Configurar tipo de suscripción
         if (dto.getTipoSuscripcionId() != null) {
             TipoSuscripcion tipoSuscripcion = new TipoSuscripcion();

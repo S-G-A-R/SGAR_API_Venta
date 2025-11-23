@@ -1,5 +1,7 @@
 package com.sgar.SGARventaAPI.modelos;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,13 +16,21 @@ public class PlanDeSuscripcion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    // FK EmpresaId: Relación Muchos a Uno con Empresa
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "EmpresaId", nullable = false)
-    private Empresa empresa;
+    // Asociado dueño del plan (un asociado puede tener varias empresas bajo el mismo plan)
+    @Column(name = "Asociadold", nullable = false)
+    private Integer asociadoId;
 
-    // NUEVA FK TipoSuscripcionId: Relación Muchos a Uno con TipoSuscripcion
+    // Relación Muchos a Uno con TipoSuscripcion
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TipoSuscripcionId", nullable = false)
     private TipoSuscripcion tipoSuscripcion;
+
+    @Column(name = "FechaInicio", nullable = true)
+    private LocalDateTime fechaInicio;
+
+    @Column(name = "FechaFin", nullable = true)
+    private LocalDateTime fechaFin;
+
+    @Column(name = "Activo", nullable = true)
+    private Boolean activo;
 }

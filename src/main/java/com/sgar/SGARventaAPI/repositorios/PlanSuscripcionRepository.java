@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlanSuscripcionRepository extends JpaRepository<PlanDeSuscripcion, Integer> {
     
-    // Buscar planes por empresa ID
-    Page<PlanDeSuscripcion> findByEmpresaId(Long empresaId, Pageable pageable);
+    // Buscar planes por asociado ID
+    Page<PlanDeSuscripcion> findByAsociadoId(Long asociadoId, Pageable pageable);
     
     // Buscar planes por tipo de suscripción ID
     Page<PlanDeSuscripcion> findByTipoSuscripcionId(Integer tipoSuscripcionId, Pageable pageable);
@@ -19,6 +19,6 @@ public interface PlanSuscripcionRepository extends JpaRepository<PlanDeSuscripci
     // Si no existe la relación planSuscripcionPadre en el modelo, comentar esta línea
     // Page<PlanDeSuscripcion> findByPlanSuscripcionPadreId(Integer planPadreId, Pageable pageable);
     
-    // Buscar planes por empresa y tipo de suscripción
-    Page<PlanDeSuscripcion> findByEmpresaIdAndTipoSuscripcionId(Long empresaId, Integer tipoSuscripcionId, Pageable pageable);
+    // Buscar planes por asociado y tipo de suscripción
+    Page<PlanDeSuscripcion> findByAsociadoIdAndTipoSuscripcionId(Long asociadoId, Integer tipoSuscripcionId, Pageable pageable);
 }

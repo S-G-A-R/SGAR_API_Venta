@@ -17,6 +17,7 @@ public class TipoSuscripcionMapper {
         dto.setSuscripcionNombre(tipoSuscripcion.getSuscripcionNombre());
         dto.setPrecio(tipoSuscripcion.getPrecio());
         dto.setLimite(tipoSuscripcion.getLimite());
+        dto.setDuracionDias(tipoSuscripcion.getDuracionDias());
         return dto;
     }
 
@@ -29,6 +30,7 @@ public class TipoSuscripcionMapper {
         tipoSuscripcion.setSuscripcionNombre(dto.getSuscripcionNombre());
         tipoSuscripcion.setPrecio(dto.getPrecio());
         tipoSuscripcion.setLimite(dto.getLimite());
+        tipoSuscripcion.setDuracionDias(dto.getDuracionDias());
         
         return tipoSuscripcion;
     }
@@ -41,5 +43,6 @@ public class TipoSuscripcionMapper {
         tipoSuscripcion.setSuscripcionNombre(dto.getSuscripcionNombre());
         tipoSuscripcion.setPrecio(dto.getPrecio());
         tipoSuscripcion.setLimite(dto.getLimite());
+        tipoSuscripcion.setDuracionDias(dto.getDuracionDias());
     }
 }

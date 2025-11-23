@@ -19,11 +19,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
     // Buscar empresas por asociado ID
     Page<Empresa> findByAsociadoId(Long asociadoId, Pageable pageable);
     
-    // Buscar empresa con sus planes y tipos de suscripción cargados (evita lazy loading)
-    @Query("SELECT e FROM Empresa e LEFT JOIN FETCH e.planes p LEFT JOIN FETCH p.tipoSuscripcion WHERE e.id = :id")
-    Optional<Empresa> findByIdWithPlanes(@Param("id") Long id);
-    
-    // Obtener el límite de productos del plan de suscripción de una empresa
-    @Query("SELECT ts.limite FROM Empresa e JOIN e.planes p JOIN p.tipoSuscripcion ts WHERE e.id = :empresaId")
-    Optional<Integer> findLimiteProductosByEmpresaId(@Param("empresaId") Long empresaId);
+    // Obtener el límite de productos del plan de suscripción por asociadoId
+    @Query("SELECT ts.limite FROM PlanDeSuscripcion p JOIN p.tipoSuscripcion ts WHERE p.asociadoId = :asociadoId")
+    Optional<Integer> findLimiteProductosByAsociadoId(@Param("asociadoId") Long asociadoId);
 }

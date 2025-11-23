@@ -35,23 +35,34 @@ public class PlanSuscripcionController {
     @Autowired
     private PlanDeSuscripcionMapper planMapper;
 
-    @PostMapping
-    @Operation(summary = "Crear un nuevo plan de suscripción", description = "Crea un nuevo plan de suscripción en el sistema")
+   @PostMapping
+    @Operation(summary = "Crear un nuevo plan de suscripción", description = "Registra la compra de un plan para un asociado y calcula su vigencia")
     @PreAuthorize("hasAnyAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearPlan(@RequestBody PlanDeSuscripcionRequets planDTO) {
         try {
-            PlanDeSuscripcion plan = planMapper.toEntity(planDTO);
-            PlanDeSuscripcion nuevoPlan = planService.crearPlan(plan);
+            // 1. YA NO USAMOS EL MAPPER AQUÍ PARA LA ENTRADA
+            // Extraemos directamente los IDs del DTO
+            Integer asociadoId = planDTO.getAsociadoId();
+            Integer tipoPlanId = planDTO.getTipoSuscripcionId();
+
+            // 2. LLAMAMOS AL SERVICIO CON LOS IDs
+            // El servicio se encarga de calcular fechaInicio, fechaFin y crear la entidad
+            PlanDeSuscripcion nuevoPlan = planService.crearPlan(asociadoId, tipoPlanId);
             
+            // 3. Preparamos la respuesta
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Plan de suscripción creado exitosamente");
             response.put("id", nuevoPlan.getId());
+            
+            // Es buena práctica devolver también cuándo vence, ya que el backend lo calculó
+            response.put("fechaFin", nuevoPlan.getFechaFin()); 
+            
             return new ResponseEntity<>(response, HttpStatus.CREATED);
+
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error al crear el plan de suscripción");
             error.put("message", e.getMessage());
-            error.put("details", e.getClass().getSimpleName());
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -165,18 +176,18 @@ public class PlanSuscripcionController {
         }
     }
 
-    @GetMapping("/buscar/empresa/{empresaId}")
-    @Operation(summary = "Buscar planes por empresa", 
-               description = "Retorna todos los planes de suscripción de una empresa específica")
+    @GetMapping("/buscar/asociado/{asociadoId}")
+    @Operation(summary = "Buscar planes por asociado", 
+               description = "Retorna todos los planes de suscripción de un asociado específico")
     @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
     public ResponseEntity<?> buscarPorEmpresa(
-            @PathVariable Long empresaId,
+            @PathVariable Long asociadoId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         
         try {
             Pageable pageable = PageRequest.of(page, size);
-            Page<PlanDeSuscripcion> planesPage = planService.buscarPlanesPorEmpresa(empresaId, pageable);
+            Page<PlanDeSuscripcion> planesPage = planService.buscarPlanesPorAsociado(asociadoId, pageable);
             
             List<PlanDeSuscripcionResponse> planesDTO = planesPage.getContent().stream()
                     .map(planMapper::toDTO)
@@ -263,41 +274,6 @@ public class PlanSuscripcionController {
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error al buscar planes por tipo de suscripción");
-            error.put("message", e.getMessage());
-            error.put("details", e.getClass().getSimpleName());
-            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/buscar/empresa-y-tipo")
-    @Operation(summary = "Buscar planes por empresa y tipo de suscripción", 
-               description = "Retorna todos los planes filtrados por empresa y tipo de suscripción")
-    @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador')")
-    public ResponseEntity<?> buscarPorEmpresaYTipo(
-            @RequestParam Long empresaId,
-            @RequestParam Integer tipoSuscripcionId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        
-        try {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<PlanDeSuscripcion> planesPage = planService.buscarPlanesPorEmpresaYTipo(empresaId, tipoSuscripcionId, pageable);
-            
-            List<PlanDeSuscripcionResponse> planesDTO = planesPage.getContent().stream()
-                    .map(planMapper::toDTO)
-                    .collect(Collectors.toList());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("planes", planesDTO);
-            response.put("currentPage", planesPage.getNumber() + 1);
-            response.put("totalItems", planesPage.getTotalElements());
-            response.put("totalPages", planesPage.getTotalPages());
-            response.put("pageSize", planesPage.getSize());
-            
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Error al buscar planes por empresa y tipo");
             error.put("message", e.getMessage());
             error.put("details", e.getClass().getSimpleName());
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
