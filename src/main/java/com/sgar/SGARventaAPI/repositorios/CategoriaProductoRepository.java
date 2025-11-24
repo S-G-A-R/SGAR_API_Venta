@@ -11,4 +11,10 @@ public interface CategoriaProductoRepository extends JpaRepository<CategoriaProd
     
     // Buscar por nombre (contiene, ignorando mayúsculas/minúsculas)
     Page<CategoriaProducto> findByNombreCatContainingIgnoreCase(String nombre, Pageable pageable);
+
+    // Buscar por asociado
+    Page<CategoriaProducto> findByAsociadoId(Long asociadoId, Pageable pageable);
+
+    // Buscar por asociado y nombre
+    Page<CategoriaProducto> findByAsociadoIdAndNombreCatContainingIgnoreCase(Long asociadoId, String nombre, Pageable pageable);
 }

@@ -16,6 +16,7 @@ public class CategoriaProductoMapper {
         CategoriaProductoResponse dto = new CategoriaProductoResponse();
         dto.setId(categoriaProducto.getId());
         dto.setNombreCat(categoriaProducto.getNombreCat());
+        dto.setAsociadoId(categoriaProducto.getAsociadoId());
         
         return dto;
     }
@@ -28,6 +29,7 @@ public class CategoriaProductoMapper {
         CategoriaProducto categoriaProducto = new CategoriaProducto();
         categoriaProducto.setId(dto.getId());
         categoriaProducto.setNombreCat(dto.getNombreCat());
+        categoriaProducto.setAsociadoId(dto.getAsociadoId());
         
         return categoriaProducto;
     }
@@ -39,6 +41,7 @@ public class CategoriaProductoMapper {
         
         CategoriaProducto categoriaProducto = new CategoriaProducto();
         categoriaProducto.setNombreCat(dto.getNombreCat());
+        categoriaProducto.setAsociadoId(dto.getAsociadoId());
         
         return categoriaProducto;
     }
@@ -49,5 +52,6 @@ public class CategoriaProductoMapper {
         }
         
         categoriaProducto.setNombreCat(dto.getNombreCat());
+        categoriaProducto.setAsociadoId(dto.getAsociadoId());
     }
 }

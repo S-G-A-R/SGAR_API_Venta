@@ -32,6 +32,12 @@ public class CategoriaProductoService implements ICategoriaProductoService {
 
     @Override
     @Transactional(readOnly = true)
+    public Page<CategoriaProducto> buscarCategoriasPorAsociadoId(Long asociadoId, Pageable pageable) {
+        return categoriaProductoRepository.findByAsociadoId(asociadoId, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<CategoriaProducto> obtenerCategoriaPorId(Integer id) {
         return categoriaProductoRepository.findById(id);
     }

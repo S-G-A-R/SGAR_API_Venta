@@ -37,7 +37,7 @@ public class CategoriaProductoController {
 
     @PostMapping
     @Operation(summary = "Crear una nueva categoría de producto", description = "Crea una nueva categoría de producto en el sistema")
-    @PreAuthorize("hasAnyAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crearCategoriaProducto(@RequestBody CategoriaProductoRequets categoriaDTO) {
         try {
             CategoriaProducto categoria = categoriaProductoMapper.toEntity(categoriaDTO);
@@ -117,7 +117,7 @@ public class CategoriaProductoController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar categoría", description = "Actualiza los datos de una categoría de producto existente")
-    @PreAuthorize("hasAnyAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado')")
     public ResponseEntity<?> actualizarCategoriaProducto(
             @PathVariable("id") Integer id, 
             @RequestBody CategoriaProductoRequets categoriaDTO) {
@@ -144,7 +144,7 @@ public class CategoriaProductoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar categoría", description = "Elimina una categoría de producto del sistema")
-    @PreAuthorize("hasAnyAuthority('ROLE_Administrador')")
+    @PreAuthorize("hasAnyAuthority('ROLE_Asociado')")
     public ResponseEntity<?> eliminarCategoriaProducto(@PathVariable("id") Integer id) {
         try {
             categoriaProductoService.eliminarCategoriaProducto(id);
@@ -194,6 +194,39 @@ public class CategoriaProductoController {
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Error al buscar categorías por nombre");
+            error.put("message", e.getMessage());
+            error.put("details", e.getClass().getSimpleName());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/buscar/asociado/{asociadoId}")
+    @Operation(summary = "Buscar categorías por ID de asociado", 
+               description = "Retorna todas las categorías de producto asociadas a un ID específico")
+    @PreAuthorize("hasAuthority('ROLE_Asociado')")
+    public ResponseEntity<?> buscarPorAsociadoId(
+            @PathVariable Long asociadoId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<CategoriaProducto> categoriasPage = categoriaProductoService.buscarCategoriasPorAsociadoId(asociadoId, pageable);
+
+            List<CategoriaProductoResponse> categoriasDTO = categoriasPage.getContent().stream()
+                    .map(categoriaProductoMapper::toDTO)
+                    .collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("categorias", categoriasDTO);
+            response.put("currentPage", categoriasPage.getNumber() + 1);
+            response.put("totalItems", categoriasPage.getTotalElements());
+            response.put("totalPages", categoriasPage.getTotalPages());
+            response.put("pageSize", categoriasPage.getSize());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Error al buscar categorías por asociado");
             error.put("message", e.getMessage());
             error.put("details", e.getClass().getSimpleName());
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

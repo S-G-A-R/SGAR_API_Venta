@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class CategoriaProductoResponse {
     private Integer id;
     private String nombreCat;
+    private Long asociadoId;
 }

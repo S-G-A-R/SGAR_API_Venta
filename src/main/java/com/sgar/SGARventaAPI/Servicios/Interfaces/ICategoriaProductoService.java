@@ -12,6 +12,8 @@ public interface ICategoriaProductoService {
     
     Page<CategoriaProducto> obtenerTodasCategorias(Pageable pageable);
     
+    Page<CategoriaProducto> buscarCategoriasPorAsociadoId(Long asociadoId, Pageable pageable);
+    
     Optional<CategoriaProducto> obtenerCategoriaPorId(Integer id);
     
     CategoriaProducto actualizarCategoriaProducto(Integer id, CategoriaProducto categoriaProducto);
