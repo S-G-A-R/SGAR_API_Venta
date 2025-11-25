@@ -19,4 +19,7 @@ public class ImagenProductoGuardarDto {
     @NotNull(message = "El tamaño es requerido")
     @Positive(message = "El tamaño debe ser positivo")
     private Long tamano;
+
+    // Si true, esta imagen será marcada como la imagen principal del producto (producto.foto)
+    private Boolean establecerComoPrincipal = false;
 }

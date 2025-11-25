@@ -14,4 +14,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer>, Jp
 
     // Contar productos por asociado (a través de empresa.asociadoId)
     long countByEmpresaAsociadoId(Long asociadoId);
+
+    // Buscar producto que tenga una imagen como foto (FK foto.id)
+    java.util.Optional<Producto> findByFotoId(Integer imagenId);
 }

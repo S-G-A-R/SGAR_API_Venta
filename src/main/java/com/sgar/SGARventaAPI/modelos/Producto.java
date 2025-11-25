@@ -33,11 +33,12 @@ public class Producto {
     @Column(name = "Tipo", length = 150, nullable = false)
     private String tipo;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "IdFoto")
+    private ImagenProductos foto;
+
     @Lob
     @Column(name = "Descripcion")
     private String descripcion;
     
-    // Relación Uno a Muchos con ImagenProducto
-    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private java.util.Set<ImagenProductos> imagenes;
 }

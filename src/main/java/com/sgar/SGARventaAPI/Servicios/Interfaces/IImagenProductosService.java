@@ -16,9 +16,9 @@ public interface IImagenProductosService {
     void eliminar(Integer id);
     
     // Operaciones específicas por producto
-    Page<ImagenProductoSalidaDto> obtenerPorProductoId(Integer productoId, Pageable pageable);
-    void eliminarTodasDeProducto(Integer productoId);
-    
+    ImagenProductoSalidaDto obtenerImagenPrincipalPorProducto(Integer productoId);
+    void eliminarImagenPrincipalDeProducto(Integer productoId);
+
     // Operaciones con filtros
-    Page<ImagenProductoSalidaDto> buscarConFiltros(Integer productoId, String tipoMime, Pageable pageable);
+    Page<ImagenProductoSalidaDto> buscarConFiltros(String tipoMime, Pageable pageable);
 }

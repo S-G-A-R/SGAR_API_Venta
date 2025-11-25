@@ -75,7 +75,8 @@ public class ImagenProductosController {
     public ResponseEntity<?> crear(
             @RequestParam("productoId") Integer productoId,
             @RequestParam("imagen") MultipartFile imagen,
-            @RequestParam(required = false) String tipoMime) {
+            @RequestParam(required = false) String tipoMime,
+            @RequestParam(name = "principal", required = false, defaultValue = "false") boolean principal) {
         try {
             validateImageOrThrow(imagen);
             
@@ -84,8 +85,9 @@ public class ImagenProductosController {
             dto.setImagen(imagen.getBytes());
             dto.setTipoMime(tipoMime != null ? tipoMime : imagen.getContentType());
             dto.setTamano(imagen.getSize());
+                dto.setEstablecerComoPrincipal(principal);
 
-            ImagenProductoSalidaDto creada = imagenProductosService.crear(dto);
+                ImagenProductoSalidaDto creada = imagenProductosService.crear(dto);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .location(URI.create("/api/imagenes-productos/" + creada.getId()))
                     .body(creada);
@@ -101,12 +103,14 @@ public class ImagenProductosController {
             @PathVariable Integer id,
             @RequestParam(value = "productoId", required = false) Integer productoId,
             @RequestParam(value = "imagen", required = false) MultipartFile imagen,
-            @RequestParam(required = false) String tipoMime) {
+            @RequestParam(required = false) String tipoMime,
+            @RequestParam(name = "principal", required = false) Boolean principal) {
         try {
             ImagenProductoModificarDto dto = new ImagenProductoModificarDto();
             dto.setId(id);
             dto.setProductoId(productoId);
             populateDtoFromMultipart(dto, imagen, tipoMime);
+            dto.setEstablecerComoPrincipal(principal);
 
             ImagenProductoSalidaDto actualizada = imagenProductosService.actualizar(id, dto);
             return ResponseEntity.ok(actualizada);
@@ -130,11 +134,10 @@ public class ImagenProductosController {
     @Operation(summary = "Obtener imágenes de un producto")
     @GetMapping("/producto/{productoId}")
     @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
-    public ResponseEntity<Page<ImagenProductoSalidaDto>> obtenerPorProducto(
-            @PathVariable Integer productoId, Pageable pageable) {
+    public ResponseEntity<ImagenProductoSalidaDto> obtenerPorProducto(@PathVariable Integer productoId) {
         try {
-            Page<ImagenProductoSalidaDto> imagenes = imagenProductosService.obtenerPorProductoId(productoId, pageable);
-            return ResponseEntity.ok(imagenes);
+            ImagenProductoSalidaDto imagen = imagenProductosService.obtenerImagenPrincipalPorProducto(productoId);
+            return ResponseEntity.ok(imagen);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -147,8 +150,8 @@ public class ImagenProductosController {
     @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<MessageResponse> eliminarTodasDeProducto(@PathVariable Integer productoId) {
         try {
-            imagenProductosService.eliminarTodasDeProducto(productoId);
-            return ResponseEntity.ok(new MessageResponse("Imágenes eliminadas"));
+            imagenProductosService.eliminarImagenPrincipalDeProducto(productoId);
+            return ResponseEntity.ok(new MessageResponse("Imagen principal eliminada"));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -158,10 +161,9 @@ public class ImagenProductosController {
     @GetMapping("/buscar")
     @PreAuthorize("hasAnyAuthority('ROLE_Asociado', 'ROLE_Administrador', 'ROLE_Ciudadano')")
     public ResponseEntity<Page<ImagenProductoSalidaDto>> buscarConFiltros(
-            @RequestParam(required = false) Integer productoId,
             @RequestParam(required = false) String tipoMime,
             Pageable pageable) {
-        Page<ImagenProductoSalidaDto> imagenes = imagenProductosService.buscarConFiltros(productoId, tipoMime, pageable);
+        Page<ImagenProductoSalidaDto> imagenes = imagenProductosService.buscarConFiltros(tipoMime, pageable);
         return ResponseEntity.ok(imagenes);
     }
 
