@@ -16,4 +16,5 @@ public class ProductoRequets {
     private String descripcion;
     private Integer categoriaProductoId;
     private Long empresaId;
+    private Integer fotoId;
 }

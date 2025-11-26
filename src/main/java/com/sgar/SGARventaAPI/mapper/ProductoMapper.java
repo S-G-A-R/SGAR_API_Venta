@@ -7,6 +7,8 @@ import com.sgar.SGARventaAPI.modelos.Empresa;
 import com.sgar.SGARventaAPI.modelos.Producto;
 import com.sgar.SGARventaAPI.repositorios.CategoriaProductoRepository;
 import com.sgar.SGARventaAPI.repositorios.EmpresaRepository;
+import com.sgar.SGARventaAPI.repositorios.ImagenProductosRepository;
+import com.sgar.SGARventaAPI.modelos.ImagenProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,9 @@ public class ProductoMapper {
 
     @Autowired
     private EmpresaRepository empresaRepository;
+    
+    @Autowired
+    private ImagenProductosRepository imagenProductosRepository;
 
     public ProductoResponse toDTO(Producto producto) {
         if (producto == null) {
@@ -38,6 +43,9 @@ public class ProductoMapper {
         dto.setDescripcion(producto.getDescripcion());
         dto.setCategoriaProducto(categoriaProductoMapper.toDTO(producto.getCategoriaProducto()));
         dto.setEmpresa(empresaMapper.toDTO(producto.getEmpresa()));
+        if (producto.getFoto() != null) {
+            dto.setFotoId(producto.getFoto().getId());
+        }
         
         return dto;
     }
@@ -66,6 +74,13 @@ public class ProductoMapper {
                     .orElseThrow(() -> new RuntimeException("Empresa no encontrada con id: " + dto.getEmpresaId()));
             producto.setEmpresa(empresa);
         }
+
+        // Asignar foto si se provee fotoId
+        if (dto.getFotoId() != null) {
+            ImagenProductos imagen = imagenProductosRepository.findById(dto.getFotoId())
+                    .orElseThrow(() -> new RuntimeException("Imagen no encontrada con id: " + dto.getFotoId()));
+            producto.setFoto(imagen);
+        }
         
         return producto;
     }
@@ -92,6 +107,13 @@ public class ProductoMapper {
             Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                     .orElseThrow(() -> new RuntimeException("Empresa no encontrada con id: " + dto.getEmpresaId()));
             producto.setEmpresa(empresa);
+        }
+
+        // Actualizar foto si se proporciona fotoId (solo si no es null)
+        if (dto.getFotoId() != null) {
+            ImagenProductos imagen = imagenProductosRepository.findById(dto.getFotoId())
+                    .orElseThrow(() -> new RuntimeException("Imagen no encontrada con id: " + dto.getFotoId()));
+            producto.setFoto(imagen);
         }
     }
 }

@@ -20,4 +20,5 @@ public class ProductoResponse {
     private String descripcion;
     private CategoriaProductoResponse categoriaProducto;
     private EmpresaResponse empresa;
+    private Integer fotoId;
 }
