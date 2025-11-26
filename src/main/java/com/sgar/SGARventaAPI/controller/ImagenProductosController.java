@@ -73,7 +73,7 @@ public class ImagenProductosController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('ROLE_Asociado')")
     public ResponseEntity<?> crear(
-            @RequestParam("productoId") Integer productoId,
+            @RequestParam(value = "productoId", required = false) Integer productoId,
             @RequestParam("imagen") MultipartFile imagen,
             @RequestParam(required = false) String tipoMime,
             @RequestParam(name = "principal", required = false, defaultValue = "false") boolean principal) {
@@ -81,7 +81,7 @@ public class ImagenProductosController {
             validateImageOrThrow(imagen);
             
             ImagenProductoGuardarDto dto = new ImagenProductoGuardarDto();
-            dto.setProductoId(productoId);
+            if (productoId != null) dto.setProductoId(productoId);
             dto.setImagen(imagen.getBytes());
             dto.setTipoMime(tipoMime != null ? tipoMime : imagen.getContentType());
             dto.setTamano(imagen.getSize());
